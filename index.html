@@ -1,51 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tables</title>
-  </head>
-  <body>
-    <h1>Sortable tables</h1>
-    <table id="myTable">
-      <thead>
-        <tr>
-          <th scope="col">Name</th>
-          <th scope="col">Age</th>
-          <th scope="col">Favorite Colour</th>
-            <th scope="col">Birthday</th>
-            
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Mark</td>
-          <td>52</td>
-          <td>Purple</td>
-            <td>15/06/1970</td>
-        </tr>
-        <tr>
-          <td>Helen</td>
-          <td>48</td>
-          <td>Blue</td>
-            <td>17/05/1974</td>
-        </tr>
-        <tr>
-          <td>Jack</td>
-          <td>21</td>
-          <td>Red</td>
-            <td>25/02/2000</td>
-        </tr>
-        <tr>
-          <td>Daisy</td>
-          <td>19</td>
-          <td>Green</td>
-            <td>05/12/2001</td>
-        </tr>
-      </tbody>
-    </table>
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" href="" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Tables</title>
+        
+        <style>
+            table {
+                table-layout: auto;
+                width: 40%;
+            }
+            table,
+            th,
+            td {
+                border: 1px solid black;
+                border-collapse: collapse;
+            }
+        </style>
+     
+    </head>
+    <body>
+        <h1>Sortable tables</h1>
+        <table id="myTable">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Age</th>
+                    <th scope="col">Favorite Colour</th>
+                    <th scope="col">Birthday</th>
+                    <th scope="col">Address</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Mark</td>
+                    <td>52</td>
+                    <td>Purple</td>
+                    <td>15/06/1970</td>
+                    <td>43, Antrobus Street</td>
+                </tr>
+                <tr>
+                    <td>Helen</td>
+                    <td>48</td>
+                    <td>Blue</td>
+                    <td>17/05/1974</td>
+                    <td>43, Antrobus Street</td>
+                    
+                </tr>
+                <tr>
+                    <td>Jack</td>
+                    <td>22</td>
+                    <td>Red</td>
+                    <td>25/02/2000</td>
+                    <td>61 Westside Quay</td>
+                </tr>
+                <tr>
+                    <td>Daisy</td>
+                    <td>20</td>
+                    <td>Green</td>
+                    <td>05/12/2001</td>
+                    <td>7 Chapel Fold</td>
+                </tr>
+            </tbody>
+        </table>
 
-    <script src="./app.js"></script>
-  </body>
+        <script src="./app.js"></script>
+    </body>
 </html>

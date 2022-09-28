@@ -7,33 +7,55 @@ var lastSort = '';
 var op = 1;
 
 (function getTableData() {
-  for (var i = 0; i < myTable.rows.length; i++) {
-    if (i === 0) {
-      for (var cell of myTable.rows[i].cells) {
-        heads.push(cell.innerHTML);
-        setUp(cell);
-      }
-    } else {     
-      items.push({});
-      for (var j = 0; j < myTable.rows[i].cells.length; j++) {
-        items[i - 1][heads[j]] = myTable.rows[i].cells[j].innerHTML;
-      } 
+    for (var i = 0; i < myTable.rows.length; i++) {
+        if (i === 0) {
+            for (var cell of myTable.rows[i].cells) {
+                heads.push(cell.innerHTML);
+                setUp(cell);
+            }
+        } else {
+            items.push({});
+            for (var j = 0; j < myTable.rows[i].cells.length; j++) {
+                items[i - 1][heads[j]] = myTable.rows[i].cells[j].innerHTML;
+            }
+        }
+        if (i === 1) {
+            for (var k = 0; k < myTable.rows[i].cells.length; k++) {
+                let f = heads[k];
+                let date = parseDate(myTable.rows[i].cells[k].innerHTML);
+                if (date != null) {
+                    types.push(sortDate(f));
+                } else if (
+                    isNaN(parseInt(myTable.rows[i].cells[k].innerHTML))
+                ) {
+                    types.push(sortStr(f));
+                } else if (isNaN(parseInt(myTable.rows[i].cells[k].innerHTML)) &&
+                    !isNaN(parseInt(myTable.rows[i].cells[k].innerHTML[0]))
+                ) {
+                    types.push(sortInitialNum(f));
+                } else {
+                    types.push(sortNum(f));
+                }
+            }
+        }
     }
-      if (i === 1) {
-          for (var k = 0; k < myTable.rows[i].cells.length; k++) {
-              let f = heads[k];
-              let date = parseDate(myTable.rows[i].cells[k].innerHTML);
-              if (date != null) {
-                  types.push(sortDate(f));
-              } else if (isNaN(parseInt(myTable.rows[i].cells[k].innerHTML))) {
-                      types.push(sortStr(f));
-                  } else {
-                      types.push(sortNum(f));
-                  }  
-          }
-      }
-  }
 })();
+
+function getDigits(a) {
+    let temp = a.split(" ")[0];
+    let num = parseInt(temp);
+    if (isNaN(num)) {
+        num = parseInt(temp.slice(0, -1));
+    }
+    return num;
+}
+
+function sortInitialNum(f) {
+    return (a, b) => {
+        return (this.getDigits(a[f]) - this.getDigits(b[f])) * this.op;
+    };
+}
+
 
 function redrawTable() {
      for (var i = 1; i < myTable.rows.length; i++) {
