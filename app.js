@@ -44,10 +44,7 @@ var op = 1;
 function getDigits(a) {
     let temp = a.split(" ")[0];
     let num = parseInt(temp);
-    if (isNaN(num)) {
-        num = parseInt(temp.slice(0, -1));
-    }
-    return num;
+    return (isNaN(num)) ? parseInt(temp.slice(0, -1)) : num;
 }
 
 function sortInitialNum(f) {
@@ -55,7 +52,6 @@ function sortInitialNum(f) {
         return (this.getDigits(a[f]) - this.getDigits(b[f])) * this.op;
     };
 }
-
 
 function redrawTable() {
      for (var i = 1; i < myTable.rows.length; i++) {
@@ -72,7 +68,6 @@ function parseDate(str) {
 
 function sortNum(f) {
     return (a, b) => {
-        console.log("num sort");
         return (parseInt(a[f]) - parseInt(b[f])) * op;
     };
 }
@@ -93,7 +88,6 @@ function sortStr(f) {
 
 function sortDate(f) {
           return (a, b) => {
-              console.log("Date sort");
             let x = parseDate(a[f]); 
             let y = parseDate(b[f]);
             if (x < y) {
@@ -122,11 +116,7 @@ function setUp(e) {
   }
 
 function sortByField(f) {
-    if (lastSort === f) {
-        op *= -1;
-    } else {
-        op = 1;
-    }
+    op = (lastSort === f) ? -op : 1;
     lastSort = f;
     items.sort(types[heads.indexOf(f)]);
     redrawTable();
