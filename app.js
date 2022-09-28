@@ -7,12 +7,48 @@ for (var table of document.getElementsByTagName('table')) {
 
 
 function sortableTable(myTable) {
+  var items = [];
+  var heads = [];
+  var types = [];
+  var lastSort = '';
+  var op = 0;
 
+  for (var i = 0; i < myTable.rows.length; i++) {
+    if (i === 0) {
+      for (var cell of myTable.rows[i].cells) {
+        heads.push(cell.innerHTML);
+        setUp(cell);
+      }
+    } else {
+      items.push({});
+      for (var j = 0; j < myTable.rows[i].cells.length; j++) {
+        items[i - 1][heads[j]] = myTable.rows[i].cells[j].innerHTML;
+      }
+    }
+    if (i === 1) {
+      for (var k = 0; k < myTable.rows[i].cells.length; k++) {
+        let f = heads[k];
+        let date = parseDate(myTable.rows[i].cells[k].innerHTML);
+        if (date != null) {
+          types.push(sortDate(f));
+        } else if (
+          isNaN(parseInt(myTable.rows[i].cells[k].innerHTML))
+        ) {
+          types.push(sortStr(f));
+        } else if (myTable.rows[i].cells[k].innerHTML.match(reg) != null) {
+          types.push(sortInitialNum(f));
+        } else {
+          types.push(sortNum(f));
+        }
+      }
+    }
+  }
   function sortInitialNum(f) {
     return (a, b) => {
       return (toFloat(a[f]) - toFloat(b[f])) * op;
     };
   }
+
   function sortNum(f) {
     return (a, b) => {
       return (parseInt(a[f]) - parseInt(b[f])) * op;
@@ -66,47 +102,12 @@ function sortableTable(myTable) {
     op = (lastSort === f) ? -op : 1;
     lastSort = f;
     items.sort(types[heads.indexOf(f)]);
-    redrawTable(myTable);
+    redrawTable();
   }
-  function redrawTable(myTable) {
+  function redrawTable() {
     for (var i = 1; i < myTable.rows.length; i++) {
       for (var j = 0; j < myTable.rows[i].cells.length; j++) {
         myTable.rows[i].cells[j].innerHTML = items[i - 1][heads[j]];
-      }
-    }
-  }
-  var items = [];
-  var heads = [];
-  var types = [];
-  var lastSort = '';
-  var op = 0;
-  for (var i = 0; i < myTable.rows.length; i++) {
-    if (i === 0) {
-      for (var cell of myTable.rows[i].cells) {
-        heads.push(cell.innerHTML);
-        setUp(cell);
-      }
-    } else {
-      items.push({});
-      for (var j = 0; j < myTable.rows[i].cells.length; j++) {
-        items[i - 1][heads[j]] = myTable.rows[i].cells[j].innerHTML;
-      }
-    }
-    if (i === 1) {
-      for (var k = 0; k < myTable.rows[i].cells.length; k++) {
-        let f = heads[k];
-        let date = parseDate(myTable.rows[i].cells[k].innerHTML);
-        if (date != null) {
-          types.push(sortDate(f));
-        } else if (
-          isNaN(parseInt(myTable.rows[i].cells[k].innerHTML))
-        ) {
-          types.push(sortStr(f));
-        } else if (myTable.rows[i].cells[k].innerHTML.match(reg) != null) {
-          types.push(sortInitialNum(f));
-        } else {
-          types.push(sortNum(f));
-        }
       }
     }
   }
@@ -121,9 +122,5 @@ function parseDate(str) {
   var m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   return (m) ? new Date(m[3], m[2]-1, m[1]) : null;
 }
-
-
-
-
 
 
