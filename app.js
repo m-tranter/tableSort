@@ -1,92 +1,87 @@
 "use strict";
 
-class Sortable {
-  constructor(e) {
-    this.table = e;
-    this.reg = /^-?[0-9]\d*(\.\d+)?/;
-    this.items = [];
-    this.cols = [];
-    this.funcs = {};
-    this.lastSort = "";
-    this.op = 0;
-    this.addNote();
-    this.makeSortable();
+function makeSortable(e) {
+  let rows = Array.from(e.rows);
+  let reg = /^-?[0-9]\d*(\.\d+)?/;
+  let items = [];
+  let funcs = {};
+  let lastSort = "";
+  let op = 0;
+
+  const note = document.createElement("p");
+  note.appendChild(document.createTextNode(
+    "Click on a heading to sort by that column."));
+  note.classList.add("cec-green");
+  e.parentNode.insertBefore(note, e);
+
+  Array.from(rows[0].cells).forEach(cell => {
+    funcs[cell.innerText] = "";
+    setUp(cell);
+  });
+
+  Array.from(rows[1].cells).forEach((cell, k) => {
+    let f = key(k);
+    let str = cell.innerText;
+    let date = parseDate(str);
+    if (date !== null) {
+      funcs[f] = sortDate(f);
+    } else if (str.match(reg) === null) {
+      funcs[f] = sortStr(f);
+    } else {
+      funcs[f] = sortInitialNum(f);
+    }
+  });
+
+  Array.from(rows).slice(1).forEach((row, i) => {
+    items.push({});
+    Array.from(row.cells).forEach((cell, j) => {
+      items[i][key(j)] = cell.innerHTML;
+      items[i][`${key(j)}inner`] = cell.innerText;
+    });
+  });
+
+  function key(ind) {
+    return Object.keys(funcs)[ind];
   }
 
-  addNote() {
-    const note = document.createElement("p");
-    note.appendChild(document.createTextNode("Click on a heading to sort by that column."));
-    note.classList.add("cec-green");
-    this.table.parentNode.insertBefore(note, this.table);
-  }
-
-  makeSortable() {
-    for (let cell of this.table.rows[0].cells) {
-      this.cols.push(cell.innerText);
-      this.funcs[cell.innerText] = "";
-      this.setUp(cell);
-    }
-
-    for (var k = 0; k < this.table.rows[1].cells.length; k++) {
-      let f = this.cols[k];
-      let str = this.table.rows[1].cells[k].innerText;
-      let date = this.parseDate(str);
-      if (date != null) {
-        this.funcs[f] = this.sortDate(f);
-      } else if (str.match(this.reg) == null) {
-        this.funcs[f] = this.sortStr(f);
-      } else {
-        this.funcs[f] = this.sortInitialNum(f);
-      }
-    }
-
-    for (var i = 1; i < this.table.rows.length; i++) {
-      this.items.push({});
-      for (var j = 0; j < this.table.rows[i].cells.length; j++) {
-        this.items[i - 1][this.cols[j]] = this.table.rows[i].cells[j].innerHTML;
-        this.items[i - 1][`${this.cols[j]}inner`] = this.table.rows[i].cells[j].innerText;
-      }
-    }
-  }
-
-  sortInitialNum(f) {
+  function sortInitialNum(f) {
     f += 'inner';
     return (a, b) => {
-      return (this.toFloat(a[f]) - this.toFloat(b[f])) * this.op;
+      return (toFloat(a[f]) - toFloat(b[f])) * op;
     };
   }
 
-  sortStr(f) {
+  function sortStr(f) {
     f += 'inner';
     return (a, b) => {
       let x = a[f].toLowerCase();
       let y = b[f].toLowerCase();
       if (x < y) {
-        return -1 * this.op;
+        return -1 * op;
       }
       if (x > y) {
-        return 1 * this.op;
+        return 1 * op;
       }
       return 0;
     };
   }
 
-  sortDate(f) {
+  function sortDate(f) {
     f += 'inner';
     return (a, b) => {
-      let x = this.parseDate(a[f]);
-      let y = this.parseDate(b[f]);
+      let x = parseDate(a[f]);
+      let y = parseDate(b[f]);
       if (x < y) {
-        return -1 * this.op;
+        return -1 * op;
       }
       if (x > y) {
-        return 1 * this.op;
+        return 1 * op;
       }
       return 0;
     };
   }
 
-  setUp(e) {
+  function setUp(e) {
     let temp = e.innerText;
     e.setAttribute("tabindex", "0");
     e.addEventListener(
@@ -102,41 +97,42 @@ class Sortable {
       () => (e.style.backgroundColor = "White")
     );
     e.addEventListener("blur", () => (e.style.backgroundColor = "White"));
-    e.addEventListener("click", () => this.sortByField(temp));
+    e.addEventListener("click", () => sortByField(temp));
     e.addEventListener("keydown", (e) => {
       if (e.code === "Enter") {
-        this.sortByField(temp);
+        sortByField(temp);
       }
     });
   }
 
-  sortByField(f) {
-    this.op = this.lastSort === f ? -this.op : 1;
-    this.lastSort = f;
-    this.items.sort(this.funcs[f]);
-    this.redrawTable();
+  function sortByField(f) {
+    op = lastSort === f ? -op : 1;
+    lastSort = f;
+    items.sort(funcs[f]);
+    redrawTable();
   }
 
-  toFloat(n) {
-    let match = n.match(this.reg);
+  function toFloat(n) {
+    let match = n.match(reg);
     return match === null ? 0 : parseFloat(match);
   }
 
-  parseDate(str) {
+  function parseDate(str) {
     var m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
     return m ? new Date(m[3], m[2] - 1, m[1]) : null;
   }
 
-  redrawTable() {
-    for (var i = 1; i < this.table.rows.length; i++) {
-      for (var j = 0; j < this.table.rows[i].cells.length; j++) {
-        this.table.rows[i].cells[j].innerHTML = this.items[i - 1][this.cols[j]];
-      }
-    }
+  function redrawTable() {
+    Array.from(rows).slice(1).forEach((row, i) => {
+      Array.from(row.cells).forEach((cell, j) => {
+        cell.innerHTML = items[i][key(j)];
+      });
+    });
   }
 }
 
+Array.from(document.getElementsByTagName("table")).forEach(e => {
+  makeSortable(e);
+});
 
-for (let e of document.getElementsByTagName("table")) {
-  let temp = new Sortable(e);
-}
+
