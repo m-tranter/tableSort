@@ -113,9 +113,6 @@ function makeSortable(e) {
   function sortByField(f) {
     let temp = [...items];
     temp.sort(funcs[f]);
-
-    console.log(items);
-    console.log(temp);
     if (temp.some((e,i) => e.index !== items[i].index)) {
       items = [...temp];
     } else {
