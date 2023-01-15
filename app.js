@@ -3,10 +3,9 @@
 function makeSortable(e) {
   let rows = Array.from(e.rows);
   let reg = /^-?[0-9]\d*(\.\d+)?/;
+  let curr = /^£?[0-9]\d*(\.\d+)?/;
   let items = [];
   let funcs = {};
-  let lastSort = "";
-  let op = 0;
 
   const note = document.createElement("p");
   note.appendChild(
@@ -25,8 +24,12 @@ function makeSortable(e) {
     let str = cell.innerText;
     if (parseDate(str)) {
       funcs[f] = sortDate(f);
+    } else if (str.match(reg)) {
+      funcs[f] = sortInitialNum(f); 
+    } else if (str.match(curr)) {
+      funcs[f] = sortCurr(f);
     } else {
-      funcs[f] = str.match(reg) === null ? sortStr(f) : sortInitialNum(f);
+      funcs[f] = sortStr(f); 
     }
   });
 
@@ -35,6 +38,7 @@ function makeSortable(e) {
     .forEach((row, i) => {
       items.push({});
       Array.from(row.cells).forEach((cell, j) => {
+        items[i].index = i;
         items[i][key(j)] = cell.innerHTML;
         items[i][`${key(j)}inner`] = parseDate(cell.innerText)
           ? new luxon.DateTime.fromFormat(cell.innerText, "dd/MM/yyyy")
@@ -49,18 +53,25 @@ function makeSortable(e) {
   function sortInitialNum(f) {
     f += "inner";
     return (a, b) => {
-      return (toFloat(a[f]) - toFloat(b[f])) * op;
+      return (toFloat(a[f]) - toFloat(b[f]));
     };
   }
 
-  function sortDate(f) {
+  function sortCurr(f) {
+    f += 'inner';
+    return (a, b) => {
+      return (parseFloat(a[f].slice(1)) - parseFloat(b[f].slice(1)));
+    }
+  }
+  
+    function sortDate(f) {
     f += "inner";
     return (a, b) => {
       if (a[f] < b[f]) {
-        return -1 * op;
+        return -1;
       }
       if (a[f] > b[f]) {
-        return 1 * op;
+        return 1;
       }
       return 0;
     };
@@ -72,10 +83,10 @@ function makeSortable(e) {
       let x = a[f].toLowerCase();
       let y = b[f].toLowerCase();
       if (x < y) {
-        return -1 * op;
+        return -1;
       }
       if (x > y) {
-        return 1 * op;
+        return 1;
       }
       return 0;
     };
@@ -100,9 +111,16 @@ function makeSortable(e) {
   }
 
   function sortByField(f) {
-    op = lastSort === f ? -op : 1;
-    lastSort = f;
-    items.sort(funcs[f]);
+    let temp = [...items];
+    temp.sort(funcs[f]);
+
+    console.log(items);
+    console.log(temp);
+    if (temp.some((e,i) => e.index !== items[i].index)) {
+      items = [...temp];
+    } else {
+      items = [...temp].reverse();
+    }
     redrawTable();
   }
 
