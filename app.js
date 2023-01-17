@@ -1,4 +1,4 @@
-"use strict"; 
+  "use strict"; 
 function makeSortable(e) { 
   const rows = Array.from(e.rows); 
   const reg = /^-?[0-9]\d*(\.\d+)?/;
@@ -121,7 +121,7 @@ function makeSortable(e) {
     e.appendChild(container);
 
     e.setAttribute("tabindex", "0");
-    e.setAttribute("style", "min-width: 10rem;");
+    e.setAttribute("style", "cursor: pointer; min-width: 10rem;");
     e.addEventListener(
       "mouseover",
       () => (e.style.backgroundColor = "PaleGreen")
@@ -183,3 +183,5 @@ function makeSortable(e) {
 Array.from(document.getElementsByTagName("table")).forEach((e) => {
   makeSortable(e);
 });
+
+
