@@ -1,11 +1,7 @@
-"use strict";
-
-function makeSortable(e) {
-  let rows = Array.from(e.rows);
-  let reg = /^-?[0-9]\d*(\.\d+)?/;
-  let curr = /^£?[0-9]\d*(\.\d+)?/;
-  let items = [];
-  let funcs = {};
+"use strict"; function makeSortable(e) { const rows = Array.from(e.rows); const reg = /^-?[0-9]\d*(\.\d+)?/;
+  const curr = /^£?[0-9]\d*(\.\d+)?/;
+  const funcs = {};
+  const icons = {};
 
   const note = document.createElement("p");
   note.appendChild(
@@ -14,13 +10,8 @@ function makeSortable(e) {
   note.classList.add("cec-green");
   e.parentNode.insertBefore(note, e);
 
-  Array.from(rows[0].cells).forEach((cell) => {
-    funcs[cell.innerText] = "";
-    setUp(cell);
-  });
-
   Array.from(rows[1].cells).forEach((cell, k) => {
-    let f = key(k);
+    let f = rows[0].cells[k].innerText;
     let str = cell.innerText;
     if (parseDate(str)) {
       funcs[f] = sortDate(f);
@@ -33,18 +24,15 @@ function makeSortable(e) {
     }
   });
 
-  Array.from(rows)
-    .slice(1)
-    .forEach((row, i) => {
-      items.push({});
-      Array.from(row.cells).forEach((cell, j) => {
-        items[i].index = i;
-        items[i][key(j)] = cell.innerHTML;
-        items[i][`${key(j)}inner`] = parseDate(cell.innerText)
-          ? new luxon.DateTime.fromFormat(cell.innerText, "dd/MM/yyyy")
-          : cell.innerText;
-      });
-    });
+  Array.from(rows[0].cells).forEach((cell) => {
+    setUp(cell);
+  });
+
+  let items = Array.from(rows).slice(1).reduce((acc, row, i) => {
+    return [...acc, Array.from(row.cells).reduce((objAcc, cell, j) => {
+      return {...objAcc, ...{"index": i, [key(j)]: cell.innerHTML, [`${key(j)}inner`]: parseDate(cell.innerText) 
+        ? new luxon.DateTime.fromFormat(cell.innerText, "dd/MM/yyyy")
+        : cell.innerText}}}, {})]}, []);
 
   function key(ind) {
     return Object.keys(funcs)[ind];
@@ -93,7 +81,34 @@ function makeSortable(e) {
   }
 
   function setUp(e) {
-    let temp = e.innerText;
+    const temp = e.innerText;
+    const row = document.createElement('div');
+    const container = document.createElement("div");
+    const titleDiv = document.createElement('div');
+    const icon = document.createElement('div');
+    const up = document.createElement('span');
+    const down = document.createElement('span');
+    up.innerHTML = "&#9650;";
+    down.innerHTML = "&#9660;";
+    container.classList.add("container");
+    row.classList.add("row", "align-items-center");
+    e.firstChild.remove();
+    e.classList.add("p-0");
+    icon.classList.add("col-2", "p-0");
+    up.classList.add("position-relative");
+    down.classList.add("position-relative");
+    up.setAttribute("style", "color: gray; bottom: .35rem;");
+    icons[`${temp}up`] = up;
+    icons[`${temp}down`] = down;
+    down.setAttribute("style", "color: gray; top: .3rem; right: 1rem;");
+    titleDiv.classList.add("col-10", "ps-1", "pe-3");
+    titleDiv.innerText = temp;
+    icon.appendChild(up);
+    icon.appendChild(down);
+    row.appendChild(titleDiv);
+    row.appendChild(icon);
+    container.appendChild(row);
+    e.appendChild(container);
     e.setAttribute("tabindex", "0");
     e.addEventListener(
       "mouseover",
@@ -110,13 +125,23 @@ function makeSortable(e) {
     });
   }
 
+  function resetIcons() {
+    Object.keys(funcs).forEach(id => {
+      icons[`${id}up`].style.color = "gray";
+      icons[`${id}down`].style.color = "gray";
+    });
+  }
+
   function sortByField(f) {
+    resetIcons();
     let temp = [...items];
     temp.sort(funcs[f]);
     if (temp.some((e,i) => e.index !== items[i].index)) {
       items = [...temp];
+      icons[`${f}up`].style.color = "black";
     } else {
       items = [...temp].reverse();
+      icons[`${f}down`].style.color = "black";
     }
     redrawTable();
   }
@@ -140,6 +165,8 @@ function makeSortable(e) {
       });
   }
 }
+
+
 
 Array.from(document.getElementsByTagName("table")).forEach((e) => {
   makeSortable(e);
