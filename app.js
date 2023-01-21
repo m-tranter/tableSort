@@ -96,7 +96,7 @@ function makeSortable(e) {
     down.innerHTML = "&#9660;";
     // Clear out the th element.
     e.firstChild.remove();
-    e.classList.add("p-0");
+    e.classList.add("p-0", "align-middle");
     // Create bootstrap column structure.
     container.classList.add("container");
     row.classList.add("row", "align-items-center");
