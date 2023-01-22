@@ -1,3 +1,6 @@
+<script src="https://cdn.jsdelivr.net/npm/luxon@3.0.4/build/global/luxon.min.js"></script>
+<script>
+  "use strict"; 
 function makeSortable(e) {
   const rows = Array.from(e.rows);
   const heads = Array.from(rows[0].cells);
@@ -44,20 +47,29 @@ function makeSortable(e) {
     ];
   }, []);
 
-  function sortInitialNum(f) {
+  function sortInitialNum(f) {  
     return (a, b) => {
+        if (a[f] === undefined || b[f] === undefined) {
+      return 0;
+    }
       return toFloat(a[f]) - toFloat(b[f]);
     };
   }
 
   function sortCurr(f) {
     return (a, b) => {
+          if (a[f] === undefined || b[f] === undefined) {
+      return 0;
+    }
       return parseFloat(a[f].slice(1)) - parseFloat(b[f].slice(1));
     };
   }
 
   function sortDate(f) {
     return (a, b) => {
+          if (a[f] === undefined || b[f] === undefined) {
+      return 0;
+    }
       if (a[f] < b[f]) {
         return -1;
       }
@@ -70,6 +82,9 @@ function makeSortable(e) {
 
   function sortStr(f) {
     return (a, b) => {
+          if (a[f] === undefined || b[f] === undefined) {
+      return 0;
+    }
       let x = a[f].toLowerCase();
       let y = b[f].toLowerCase();
       if (x < y) {
@@ -168,3 +183,4 @@ function makeSortable(e) {
 Array.from(document.getElementsByTagName("table")).forEach((e) => {
   makeSortable(e);
 });
+</script>
