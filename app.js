@@ -1,17 +1,15 @@
-<script src="https://cdn.jsdelivr.net/npm/luxon@3.0.4/build/global/luxon.min.js"></script>
-<script>
-  "use strict"; 
+'use strict';
 function makeSortable(e) {
   const rows = Array.from(e.rows);
   const heads = Array.from(rows[0].cells);
   const reg = /^-?[0-9]\d*(\.\d+)?/;
   const curr = /^£?[0-9]\d*(\.\d+)?/;
-  const note = document.createElement("p");
-  note.setAttribute("id", "tableNote");
+  const note = document.createElement('p');
+  note.setAttribute('id', 'tableNote');
   note.appendChild(
-    document.createTextNode("Click on a heading to sort by that column.")
+    document.createTextNode('Click on a heading to sort by that column.')
   );
-  note.classList.add("cec-green");
+  note.classList.add('cec-green');
   e.parentNode.insertBefore(note, e);
 
   heads.forEach((cell, k) => {
@@ -39,7 +37,7 @@ function makeSortable(e) {
             index: i,
             [heads[j].id]: cell.innerHTML,
             [`${heads[j].id}inner`]: parseDate(cell.innerText)
-              ? new luxon.DateTime.fromFormat(cell.innerText, "dd/MM/yyyy")
+              ? new luxon.DateTime.fromFormat(cell.innerText, 'dd/MM/yyyy')
               : cell.innerText,
           },
         };
@@ -47,46 +45,34 @@ function makeSortable(e) {
     ];
   }, []);
 
-  function sortInitialNum(f) {  
+  function sortInitialNum(f) {
     return (a, b) => {
-        if (a[f] === undefined || b[f] === undefined) {
-      return 0;
-    }
-      return toFloat(a[f]) - toFloat(b[f]);
+      let x = a[f] ? toFloat(a[f]) : 0;
+      let y = b[f] ? toFloat(b[f]) : 0;
+      return x - y;
     };
   }
 
   function sortCurr(f) {
     return (a, b) => {
-          if (a[f] === undefined || b[f] === undefined) {
-      return 0;
-    }
-      return parseFloat(a[f].slice(1)) - parseFloat(b[f].slice(1));
+      let x = a[f] ? parseFloat(a[f]) : 0;
+      let y = b[f] ? parseFloat(b[f]) : 0;
+      return x - y;
     };
   }
 
   function sortDate(f) {
     return (a, b) => {
-          if (a[f] === undefined || b[f] === undefined) {
-      return 0;
-    }
-      if (a[f] < b[f]) {
-        return -1;
-      }
-      if (a[f] > b[f]) {
-        return 1;
-      }
-      return 0;
+      let x = !a[f] ? -Number.MAX_VALUE : a[f];
+      let y = !b[f] ? -Number.MAX_VALUE : b[f];
+      return x - y;
     };
   }
 
   function sortStr(f) {
     return (a, b) => {
-          if (a[f] === undefined || b[f] === undefined) {
-      return 0;
-    }
-      let x = a[f].toLowerCase();
-      let y = b[f].toLowerCase();
+      let x = a[f] ? a[f].toLowerCase() : '';
+      let y = b[f] ? b[f].toLowerCase() : '';
       if (x < y) {
         return -1;
       }
@@ -99,25 +85,25 @@ function makeSortable(e) {
 
   function setUp(e) {
     const text = e.innerText;
-    const row = document.createElement("div");
-    const container = document.createElement("div");
-    const titleDiv = document.createElement("div");
-    const iconDiv = document.createElement("div");
-    const up = document.createElement("span");
-    const down = document.createElement("span");
+    const row = document.createElement('div');
+    const container = document.createElement('div');
+    const titleDiv = document.createElement('div');
+    const iconDiv = document.createElement('div');
+    const up = document.createElement('span');
+    const down = document.createElement('span');
     // Use unicode up and down arrows.
-    up.innerHTML = "&#9650;";
-    down.innerHTML = "&#9660;";
-    up.classList.add("upIcon");
-    down.classList.add("downIcon");
+    up.innerHTML = '&#9650;';
+    down.innerHTML = '&#9660;';
+    up.classList.add('upIcon');
+    down.classList.add('downIcon');
     // Clear out the th element.
     e.firstChild.remove();
-    e.classList.add("p-0", "align-middle", "tableHead");
+    e.classList.add('p-0', 'align-middle', 'tableHead');
     // Create bootstrap column structure.
-    container.classList.add("container");
-    row.classList.add("row", "align-items-center");
-    iconDiv.classList.add("col-1", "p-0");
-    titleDiv.classList.add("col-11", "ps-2", "pt-1");
+    container.classList.add('container');
+    row.classList.add('row', 'align-items-center');
+    iconDiv.classList.add('col-1', 'p-0');
+    titleDiv.classList.add('col-11', 'ps-2', 'pt-1');
     // Put the column name in the new title div.
     titleDiv.innerText = text;
     // Save the elem ids so we can change colours.
@@ -130,12 +116,12 @@ function makeSortable(e) {
     row.appendChild(iconDiv);
     container.appendChild(row);
     e.appendChild(container);
-    e.setAttribute("tabindex", "0");
-    e.addEventListener("click", () => {
+    e.setAttribute('tabindex', '0');
+    e.addEventListener('click', () => {
       sortByField(e);
     });
-    e.addEventListener("keydown", (e) => {
-      if (e.code === "Enter") {
+    e.addEventListener('keydown', (e) => {
+      if (e.code === 'Enter') {
         sortByField(e);
       }
     });
@@ -143,32 +129,32 @@ function makeSortable(e) {
 
   function resetIcons() {
     heads.forEach((obj) => {
-      obj.up.style.color = "gray";
-      obj.down.style.color = "gray";
+      obj.up.style.color = 'gray';
+      obj.down.style.color = 'gray';
     });
   }
 
   function sortByField(e) {
     resetIcons();
     let temp = [...items];
-    temp.sort(e.func(e.id + "inner"));
+    temp.sort(e.func(e.id + 'inner'));
     if (temp.some((e, i) => e.index !== items[i].index)) {
       items = [...temp];
-      e.up.style.color = "black";
+      e.up.style.color = 'black';
     } else {
       items = [...temp].reverse();
-      e.down.style.color = "black";
+      e.down.style.color = 'black';
     }
     redrawTable();
   }
 
   function toFloat(n) {
     let match = n.match(reg);
-    return match === null ? 0 : parseFloat(match);
+    return match ? parseFloat(match) : 0;
   }
 
   function parseDate(str) {
-    return str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/) !== null;
+    return str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   }
 
   function redrawTable() {
@@ -180,7 +166,8 @@ function makeSortable(e) {
   }
 }
 
-Array.from(document.getElementsByTagName("table")).forEach((e) => {
-  makeSortable(e);
+Array.from(document.getElementsByTagName('table')).forEach((e) => {
+  if (e.rows.length > 2) {
+    makeSortable(e);
+  }
 });
-</script>
